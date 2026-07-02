@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Github, Sparkles, ArrowRight, Loader2 } from 'lucide-react'
+import { Sparkles, ArrowRight, Loader2 } from 'lucide-react'
 
 export default function Home() {
   const [githubUrl, setGithubUrl] = useState('')
