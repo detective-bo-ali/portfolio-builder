@@ -23,6 +23,10 @@ export default function Dashboard() {
           .order('created_at', { ascending: false })
         
         setPortfolios(data || [])
+      } else {
+        // Also show portfolios created without sign-in
+        // For now, show a message
+        setPortfolios([])
       }
       setLoading(false)
     }
@@ -39,12 +43,23 @@ export default function Dashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">Please sign in</p>
-          <Button className="mt-4" onClick={() => window.location.href = '/'}>
-            Go Home
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-sm max-w-md text-center">
+          <h2 className="text-2xl font-bold mb-4">Sign in to Save Your Portfolios</h2>
+          <p className="text-gray-600 mb-6">
+            You generated a portfolio without signing in. 
+            Sign in with GitHub to save and manage all your portfolios in one place.
+          </p>
+          <Button 
+            onClick={() => window.location.href = '/api/auth/signin'}
+            className="w-full"
+          >
+            <Github className="mr-2 h-4 w-4" />
+            Sign in with GitHub
           </Button>
+          <p className="mt-4 text-sm text-gray-400">
+            <a href="/" className="text-blue-600 hover:underline">← Back to Home</a>
+          </p>
         </div>
       </div>
     )
@@ -55,9 +70,17 @@ export default function Dashboard() {
       <nav className="bg-white border-b px-4 py-4">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold">Dashboard</h1>
-          <Button variant="outline" onClick={() => window.location.href = '/'}>
-            Build New Portfolio
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => window.location.href = '/'}>
+              Build New Portfolio
+            </Button>
+            <Button variant="outline" onClick={async () => {
+              await supabase.auth.signOut()
+              window.location.href = '/'
+            }}>
+              Sign Out
+            </Button>
+          </div>
         </div>
       </nav>
 
