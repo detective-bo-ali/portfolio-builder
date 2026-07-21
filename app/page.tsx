@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Github, Sparkles, ArrowRight, Loader2 } from 'lucide-react'
+import { GitHub, Sparkles, ArrowRight, Loader2 } from 'lucide-react'
 
 export default function Home() {
   const [githubUrl, setGithubUrl] = useState('')
@@ -60,7 +60,7 @@ export default function Home() {
               Dashboard
             </a>
             <Button variant="outline" onClick={() => window.location.href = '/auth'}>
-              <Github className="mr-2 h-4 w-4" />
+              <GitHub className="mr-2 h-4 w-4" />
               Sign In (Optional)
             </Button>
           </div>
