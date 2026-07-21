@@ -1,10 +1,9 @@
 "use client"
 
-import { Github, ExternalLink } from 'lucide-react'
+import { GitHub, ExternalLink } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
-import { ExternalLink } from 'lucide-react'
 
 export default function Dashboard() {
   const [portfolios, setPortfolios] = useState<any[]>([])
@@ -55,7 +54,7 @@ export default function Dashboard() {
             onClick={() => window.location.href = '/api/auth/signin'}
             className="w-full"
           >
-            <Github className="mr-2 h-4 w-4" />
+            <GitHub className="mr-2 h-4 w-4" />
             Sign in with GitHub
           </Button>
           <p className="mt-4 text-sm text-gray-400">
