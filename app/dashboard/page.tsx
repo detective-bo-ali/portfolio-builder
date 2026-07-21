@@ -1,9 +1,9 @@
 "use client"
 
-import { GitHub, ExternalLink } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
+import { ExternalLink } from 'lucide-react'
 
 export default function Dashboard() {
   const [portfolios, setPortfolios] = useState<any[]>([])
@@ -24,8 +24,6 @@ export default function Dashboard() {
         
         setPortfolios(data || [])
       } else {
-        // Also show portfolios created without sign-in
-        // For now, show a message
         setPortfolios([])
       }
       setLoading(false)
@@ -51,10 +49,14 @@ export default function Dashboard() {
             Sign in with GitHub to save and manage all your portfolios in one place.
           </p>
           <Button 
-            onClick={() => window.location.href = '/api/auth/signin'}
+            onClick={async () => {
+              await supabase.auth.signInWithOAuth({
+                provider: 'github',
+                options: { redirectTo: window.location.origin }
+              })
+            }}
             className="w-full"
           >
-            <GitHub className="mr-2 h-4 w-4" />
             Sign in with GitHub
           </Button>
           <p className="mt-4 text-sm text-gray-400">
