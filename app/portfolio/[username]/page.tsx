@@ -29,10 +29,6 @@ export default async function PortfolioPage({ params }: PortfolioPageProps) {
   return (
     <div className="min-h-screen bg-white">
       <div dangerouslySetInnerHTML={{ __html: portfolio.html_content }} />
-      
-      <div className="fixed bottom-4 right-4 text-xs text-gray-400 bg-white/80 px-3 py-1 rounded-full shadow-sm">
-        Built with <a href="/" className="text-blue-600 hover:underline">PortfolioPro</a>
-      </div>
     </div>
   )
 }
