@@ -7,25 +7,18 @@ import { ExternalLink } from 'lucide-react'
 
 export default function Dashboard() {
   const [portfolios, setPortfolios] = useState<any[]>([])
-  const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function loadData() {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-
-      if (user) {
-        const { data } = await supabase
-          .from('portfolios')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-        
-        setPortfolios(data || [])
-      } else {
-        setPortfolios([])
-      }
+      // Get all portfolios (since no auth, show all)
+      const { data } = await supabase
+        .from('portfolios')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20)
+      
+      setPortfolios(data || [])
       setLoading(false)
     }
     loadData()
@@ -39,61 +32,25 @@ export default function Dashboard() {
     )
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-sm max-w-md text-center">
-          <h2 className="text-2xl font-bold mb-4">Sign in to Save Your Portfolios</h2>
-          <p className="text-gray-600 mb-6">
-            You generated a portfolio without signing in. 
-            Sign in with GitHub to save and manage all your portfolios in one place.
-          </p>
-          <Button 
-            onClick={async () => {
-              await supabase.auth.signInWithOAuth({
-                provider: 'github',
-                options: { redirectTo: window.location.origin }
-              })
-            }}
-            className="w-full"
-          >
-            Sign in with GitHub
-          </Button>
-          <p className="mt-4 text-sm text-gray-400">
-            <a href="/" className="text-blue-600 hover:underline">← Back to Home</a>
-          </p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white border-b px-4 py-4">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold">Dashboard</h1>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => window.location.href = '/'}>
-              Build New Portfolio
-            </Button>
-            <Button variant="outline" onClick={async () => {
-              await supabase.auth.signOut()
-              window.location.href = '/'
-            }}>
-              Sign Out
-            </Button>
-          </div>
+          <h1 className="text-xl font-bold">PortfolioPro</h1>
+          <Button variant="outline" onClick={() => window.location.href = '/'}>
+            Build New Portfolio
+          </Button>
         </div>
       </nav>
 
       <main className="max-w-6xl mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold mb-6">Your Portfolios</h2>
+        <h2 className="text-2xl font-bold mb-6">Recent Portfolios</h2>
         
         {portfolios.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg border">
-            <p className="text-gray-500">You haven't built any portfolios yet.</p>
+            <p className="text-gray-500">No portfolios built yet.</p>
             <Button className="mt-4" onClick={() => window.location.href = '/'}>
-              Create Your First Portfolio
+              Build Your Portfolio
             </Button>
           </div>
         ) : (
