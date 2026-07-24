@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { generateBio } from '@/lib/ai'
 
 export async function POST(req: NextRequest) {
   try {
-    const { githubUrl, userId } = await req.json()
+    const { githubUrl } = await req.json()
     
     if (!githubUrl) {
       return NextResponse.json(
@@ -18,7 +17,7 @@ export async function POST(req: NextRequest) {
     
     if (!username) {
       return NextResponse.json(
-        { error: 'Invalid GitHub URL. Please use format: https://github.com/username' },
+        { error: 'Invalid GitHub URL' },
         { status: 400 }
       )
     }
@@ -33,15 +32,16 @@ export async function POST(req: NextRequest) {
     if (existing) {
       return NextResponse.json({
         success: true,
+        username: username,
         portfolio: existing,
         message: 'Portfolio already exists'
       })
     }
 
-    // Generate bio with AI
-    const bio = await generateBio(username, [])
+    // Generate a simple bio
+    const bio = `${username} is a passionate developer building innovative software solutions. Check out their work on GitHub at https://github.com/${username}`
 
-    // Build beautiful HTML portfolio
+    // Build HTML portfolio
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -123,6 +123,20 @@ export async function POST(req: NextRequest) {
             font-size: 0.8rem;
             color: #9ca3af;
           }
+          .profile-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 10px 24px;
+            background: #1f2937;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s;
+          }
+          .profile-link:hover {
+            background: #111827;
+          }
           .watermark {
             margin-top: 3rem;
             padding-top: 2rem;
@@ -177,22 +191,29 @@ export async function POST(req: NextRequest) {
           <h1>${username}</h1>
           <div class="bio">${bio}</div>
           
-          <div class="section-title">📁 Featured Repositories</div>
+          <div class="section-title">📁 GitHub Profile</div>
+          <div style="text-align: center;">
+            <a href="https://github.com/${username}" target="_blank" class="profile-link">
+              View on GitHub →
+            </a>
+          </div>
+          
+          <div class="section-title" style="margin-top: 2rem;">⭐ Featured Repositories</div>
           <div class="repos">
             <div class="repo-card">
               <div class="repo-name">🌟 PortfolioPro</div>
               <div class="repo-desc">Built with AI in 2 minutes — ${username}'s portfolio</div>
             </div>
             <div class="repo-card">
-              <div class="repo-name">🚀 Coming Soon</div>
-              <div class="repo-desc">More repositories will appear here</div>
+              <div class="repo-name">🚀 Check GitHub</div>
+              <div class="repo-desc">Visit ${username}'s GitHub for more projects</div>
             </div>
           </div>
 
           <div class="upgrade-box">
             <h3>✨ Want to remove the watermark?</h3>
             <p>Pay $9 once — lifetime access</p>
-            <a href="https://paypal.me/YOUR_PAYPAL_HANDLE/9" target="_blank" class="pay-btn">
+            <a href="https://paypal.me/YOUR_PAYPAL/9" target="_blank" class="pay-btn">
               Pay with PayPal
             </a>
             <p style="font-size: 0.8rem; color: #6b7280; margin-top: 8px;">
@@ -208,25 +229,32 @@ export async function POST(req: NextRequest) {
       </html>
     `
 
-    // Save to database (userId can be null now)
+    // Save to database
     const { data, error } = await supabase
       .from('portfolios')
       .insert({
-        user_id: userId || null,  // Allow null for anonymous users
+        user_id: null,
         html_content: htmlContent,
         share_slug: username,
       })
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      console.error('Database error:', error)
+      return NextResponse.json(
+        { error: 'Database error: ' + error.message },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,
+      username: username,
       portfolio: data,
     })
   } catch (error) {
-    console.error('Generation error:', error)
+    console.error('Error:', error)
     return NextResponse.json(
       { error: 'Failed to generate portfolio. Please try again.' },
       { status: 500 }
